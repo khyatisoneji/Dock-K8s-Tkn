@@ -8,11 +8,10 @@ import (
     "database/sql"
     "github.com/gorilla/mux"
     _ "github.com/go-sql-driver/mysql"
-    "io/ioutil"
 )
 
 type printStr struct {
-    text string
+    Text string
 }
 
 var db *sql.DB
@@ -37,21 +36,20 @@ func webServer(w http.ResponseWriter, r *http.Request){
     		}
     		json.NewEncoder(w).Encode(strings)
 	} else if(r.Method == http.MethodPost) {
-                data, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			panic(err.Error())
-	    	}
-                var str printStr
-        	err = json.Unmarshal(data, &str)
-	   	if err != nil {
-	    		panic(err.Error())
-	   	}
+		fmt.Println(r.Body)
+                decoder := json.NewDecoder(r.Body)
+   		var str printStr
+   		err := decoder.Decode(&str)
+                fmt.Println(str)
+   		if err != nil {
+    			panic(err.Error())
+   		}
 	   	insert,err := db.Prepare("INSERT INTO demo(val) VALUES(?)")
 	    	if err != nil {
 			panic(err.Error())
 	    	}
-	    	insert.Exec(str.text)
-	    	fmt.Println(str.text)
+	    	insert.Exec(str.Text)
+	    	fmt.Println(str.Text)
         } else {
 	  	fmt.Println("Not supported")
         }
