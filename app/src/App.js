@@ -31,11 +31,11 @@ class App extends Component {
 	    await axios.post(
 		"welcome", 
 		 {
-		    text: this.state.inputValue,
+		    Text:this.state.inputValue,
 		},
 		{headers}
 		).then(response => {
-		    console.log("Success ========>", response);
+		    console.log("Success ========>", this.state.inputValue);
 		})
 		.catch(error => {
 		    console.log("Error ========>", error);
@@ -52,7 +52,6 @@ class App extends Component {
             .then((response) => {
                   console.log("response: " + response)
                   this.setState({ data: response.data, isLoading: false });
-		  <p>{this.state.data}</p>
              })
             .catch((err) => {
                   this.setState({ data: err, isLoading: false });
@@ -66,6 +65,7 @@ class App extends Component {
 		  <input type="text" value={this.state.inputValue} onChange={this.handleChange} />
                   <button onClick={this.add} disabled={this.state.isLoading}> Add </button>
 	          <button onClick={this.show} disabled={this.state.isLoading}> Show all </button>
+		  <p>{this.state.data}</p>
                 </form>
             </div>
            );
