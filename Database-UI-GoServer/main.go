@@ -8,28 +8,53 @@ import (
     "database/sql"
     "github.com/gorilla/mux"
     _ "github.com/go-sql-driver/mysql"
+    "io/ioutil"
 )
+
+type printStr struct {
+    text string
+}
 
 var db *sql.DB
 var err error
 
 func webServer(w http.ResponseWriter, r *http.Request){
-   results, err := db.Query("SELECT * FROM test")
-    if err != nil {
-        panic(err.Error())
-    }
-    var printStr []string
-    for results.Next(){
-        var id int
-        var str string
-        err = results.Scan(&id, &str)
-        if err != nil {
-            panic(err.Error())
+	if(r.Method == http.MethodGet) {
+		results, err := db.Query("SELECT * FROM demo")
+		if err != nil {
+			panic(err.Error())
+	    	}
+	    	var strings []string
+	    	for results.Next(){
+			var id int
+			var str string
+			err = results.Scan(&id, &str)
+			if err != nil {
+		    		panic(err.Error())
+			}
+			strings = append(strings, str)
+			log.Println(str)
+    		}
+    		json.NewEncoder(w).Encode(strings)
+	} else if(r.Method == http.MethodPost) {
+                data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err.Error())
+	    	}
+                var str printStr
+        	err = json.Unmarshal(data, &str)
+	   	if err != nil {
+	    		panic(err.Error())
+	   	}
+	   	insert,err := db.Prepare("INSERT INTO demo(val) VALUES(?)")
+	    	if err != nil {
+			panic(err.Error())
+	    	}
+	    	insert.Exec(str.text)
+	    	fmt.Println(str.text)
+        } else {
+	  	fmt.Println("Not supported")
         }
-        printStr = append(printStr, str)
-        log.Println(str)
-    }
-    json.NewEncoder(w).Encode(printStr)
 }
 
 func handleRequests() {
@@ -44,22 +69,9 @@ func main() {
         panic(err.Error())
     }
     defer db.Close()
-    _,err = db.Exec("CREATE TABLE IF NOT EXISTS test ( id integer, str varchar(500) )")
+    _,err = db.Exec("CREATE TABLE IF NOT EXISTS demo ( id integer NOT NULL AUTO_INCREMENT, val varchar(500),  PRIMARY KEY (id) )")
     if err != nil {
        panic(err)
-    }
-    printString := []string{
-        "Hello World!!",
-        "Hope you have a good day!",
-    }
-    fmt.Println(printString)
-    for id, str := range printString {
-        insert,err := db.Prepare("INSERT INTO test(id, str) VALUES(?, ?)")
-        if err != nil {
-            panic(err.Error())
-        }
-        insert.Exec(id,str)
-        log.Println(str)
     }
     handleRequests()
 }
