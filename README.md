@@ -1,5 +1,6 @@
-# containers-assignment
-This is part of the assignments assigned under the training period to understand containers and how to deploy and run containers in Kubernetes
+These assignments are assigned under the training period to understand containers and how to deploy and run containers in Kubernetes and also to understand how Tekton Pipeline works
+
+**K8s**
 
 **How to create secrets:**
 
