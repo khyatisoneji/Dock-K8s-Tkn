@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-push
+spec:
+  workspaces:
+    - name: source
+  params: 
+    - name: IMAGE
+      type: string
+    - name: APP-IMAGE
+      type: string
+  steps:
+    - name: build-images
+      image:  quay.io/buildah/stable:v1.17.0
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/bash"]
+      args: ["-c", "buildah bud -t $(params.IMAGE) ./Database-UI-GoServer/Dockerfile; buildah bud -t $(params.APP-IMAGE) ./app/Dockerfile"]
+      volumeMounts:
+        - name: varlibcontainers
+          mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
+    - name: push-go-image
+      image: quay.io/buildah/stable:v1.17.0)
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/bash"]
+      args: ["-c", "buildah push --creds $USERNAME:$PASSWORD localhost/$(params.IMAGE)  docker://$USERNAME/$(params.IMAGE); buildah push --creds $USERNAME:$PASSWORD localhost/$(params.APP-IMAGE)  docker://$USERNAME/$(params.APP-IMAGE)"]
+      env:
+      - name: USERNAME
+        valueFrom:
+          secretKeyRef:
+            name: docker-creds
+            key: USERNAME
+      - name: PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: docker-creds
+            key: PASSWORD
+      volumeMounts:
+      - name: varlibcontainers
+        mountPath: /var/lib/containers
+      securityContext:
+        privileged: true
+
+  volumes:
+    - name: varlibcontainers
+      emptyDir: {}

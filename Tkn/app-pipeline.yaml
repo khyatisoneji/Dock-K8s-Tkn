@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: app-pipeline
+spec:
+  params: 
+    - name: url
+      type: string
+    - name: IMAGE
+      type: string
+    - name: APP-IMAGE
+      type: string
+    - name: sub-dir
+      type: string
+  workspaces:
+  - name: source
+  tasks:
+  - name: clone-repo
+    workspaces:
+    - name: output
+      workspace: source
+    taskRef:
+      name: git-clone
+    params:
+      - name: url
+        value: $(params.url)
+      - name: deleteExisting
+        value: "true"
+  - name: build-images
+    runAfter:
+    - clone-repo
+    taskRef: 
+      name: build-push
+    workspaces:
+      - name: source
+        workspace: source
+    params:
+      - name : IMAGE
+        value: $(params.IMAGE)
+      - name : APP-IMAGE
+        value: $(params.APP-IMAGE)
+  - name: deploy-app
+    runAfter:
+    - build-images
+    taskRef: 
+      name: deploy-app
+    workspaces:
+      - name: source
+        workspace: source
+    params:
+      - name: sub-dir
+        value: $(params.sub-dir)

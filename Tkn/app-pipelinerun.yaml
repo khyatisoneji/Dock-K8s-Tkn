@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: app-pipeline-run
+spec:
+  serviceAccountName: admin
+  pipelineRef:
+    name: app-pipeline
+  params:
+  - name: url
+    value: https://github.com/khyatisoneji/Dock-K8s-Tkn
+  - name: IMAGE
+    value: database:v1
+  - name: APP-IMAGE
+    value: reactserver:v1
+  - name: sub-dir
+    value: K8s
+  workspaces:
+  - name: source
+    persistentvolumeclaim:
+      claimName: pvc

@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: deploy-app
+spec:
+  workspaces:
+    - name: source
+  params: 
+    - name: sub-dir
+      type: string
+  steps:
+    - name: db-deployment
+      image:  lachlanevenson/k8s-kubectl
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/sh"]
+      args: ["-c"," kubectl apply -f ./$(params.sub-dir)/dbDeployment.yaml; kubectl apply -f ./$(params.sub-dir)/dbService.yaml"]
+    - name: go-deployment
+      image:  lachlanevenson/k8s-kubectl
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/sh"]
+      args: ["-c"," kubectl apply -f ./$(params.sub-dir)/goDeployment.yaml; kubectl apply -f ./$(params.sub-dir)/goService.yaml"]
+    - name: react-deployment
+      image:  lachlanevenson/k8s-kubectl
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/sh"]
+      args: ["-c"," kubectl apply -f ./$(params.sub-dir)/reactDeployment.yaml; kubectl apply -f ./$(params.sub-dir)/reactService.yaml"]
