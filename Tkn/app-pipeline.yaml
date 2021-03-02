@@ -10,8 +10,6 @@ spec:
       type: string
     - name: APP-IMAGE
       type: string
-    - name: sub-dir
-      type: string
   workspaces:
   - name: source
   tasks:
@@ -47,6 +45,3 @@ spec:
     workspaces:
       - name: source
         workspace: source
-    params:
-      - name: sub-dir
-        value: $(params.sub-dir)

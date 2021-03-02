@@ -22,7 +22,7 @@ spec:
       securityContext:
         privileged: true
     - name: push-go-image
-      image: quay.io/buildah/stable:v1.17.0)
+      image: quay.io/buildah/stable:v1.17.0
       workingdir: $(workspaces.source.path)
       command: ["/bin/bash"]
       args: ["-c", "buildah push --creds $USERNAME:$PASSWORD localhost/$(params.IMAGE)  docker://$USERNAME/$(params.IMAGE); buildah push --creds $USERNAME:$PASSWORD localhost/$(params.APP-IMAGE)  docker://$USERNAME/$(params.APP-IMAGE)"]
