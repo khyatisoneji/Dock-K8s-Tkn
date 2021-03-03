@@ -7,18 +7,23 @@ spec:
   workspaces:
     - name: source
   steps:
+    - name: mysql-pv-c
+      image:  lachlanevenson/k8s-kubectl
+      workingdir: $(workspaces.source.path)
+      command: ["/bin/sh"]
+      args: ["-c","kubectl apply -f ./K8s/mysqlPV.yaml; kubectl apply -f ./K8s/mysqlPVC.yaml"] 
     - name: db-deployment
       image:  lachlanevenson/k8s-kubectl
       workingdir: $(workspaces.source.path)
       command: ["/bin/sh"]
-      args: ["-c"," kubectl apply -f ./K8s/dbDeployment.yaml; kubectl apply -f ./K8s/dbService.yaml"]
+      args: ["-c","docker login; kubectl apply -f ./K8s/dbDeployment.yaml; kubectl apply -f ./K8s/dbService.yaml"]
     - name: go-deployment
       image:  lachlanevenson/k8s-kubectl
       workingdir: $(workspaces.source.path)
       command: ["/bin/sh"]
-      args: ["-c"," kubectl apply -f ./K8s/goDeployment.yaml; kubectl apply -f ./K8s/goService.yaml"]
+      args: ["-c","docker login; kubectl apply -f ./K8s/goDeployment.yaml; kubectl apply -f ./K8s/goService.yaml"]
     - name: react-deployment
       image:  lachlanevenson/k8s-kubectl
       workingdir: $(workspaces.source.path)
       command: ["/bin/sh"]
-      args: ["-c"," kubectl apply -f ./K8s/reactDeployment.yaml; kubectl apply -f ./K8s/reactService.yaml"]
+      args: ["-c","docker login; kubectl apply -f ./K8s/reactDeployment.yaml; kubectl apply -f ./K8s/reactService.yaml"]
